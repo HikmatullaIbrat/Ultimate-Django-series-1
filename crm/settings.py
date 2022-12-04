@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'maidane_baazi',
-    'debug_toolbar'
+    'debug_toolbar',
+    'store',
+    'tags'
+    
 ]
 
 MIDDLEWARE = [
