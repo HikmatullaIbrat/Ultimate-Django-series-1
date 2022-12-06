@@ -13,7 +13,7 @@ class TaggedItem(models.Model):
 
     # we could add a foreignKey of product class to taggetItem class for tagging the items, but it makes 
     # taggedItem dependent to just product class and if want to tag some other contents like videos or 
-# article we this taggedItem class won't work for them, Therefore we use the built-in contenttype class.
+    # article we this taggedItem class won't work for them, Therefore we use the built-in contenttype class
     # so we comment the product foreign key
     # product = models.ForeignKey(Product)
     # so to use conttype class we have to identify the type and id of the object
