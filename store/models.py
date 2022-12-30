@@ -20,21 +20,23 @@ class Collection(models.Model):
 class Product(models.Model):
     # to put our own primary key, we can write below code:
     # prim_key_field = models.CharField(max_length=10, primary_key=True)
-    
+    promotions = models.ManyToManyField(Promotion, verbose_name="Promotion for product")
    
     title = models.CharField(max_length=255)
-    slug = models.SlugField(default = "-", unique=True, blank=True)
+    
     description = models.TextField()
-    price = models.DecimalField(max_digits=6, decimal_places = 3)
+    unit_price = models.DecimalField(max_digits=6, decimal_places = 3)
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     # one product can be once in a collection, but on the other hand one collection can have multiple 
     # products
-    collection_of_products =  models.ForeignKey(Collection, verbose_name=("collection of multiple products"), on_delete=models.PROTECT)
+    # Never name a foriegnKey field something_id just use something when your using MySQL like the below one
+    collection =  models.ForeignKey(Collection, verbose_name=("collection of multiple products"), on_delete=models.CASCADE)
     # also in another senario a collection can have one or zero featured_product
     #CASCADE.PROTECT means if we accedently deleted a collection all the products in that collection
     # should not be deleted.
-    promotions = models.ManyToManyField(Promotion, verbose_name="Promotion for product",)
+    
+    slug = models.SlugField(default = "-", blank=True)
 
 class Customer(models.Model):
     BRONZE_MEMBERSHIP='B'
@@ -75,13 +77,13 @@ class Order(models.Model):
     ]
     payment_status = models.CharField(max_length=1, choices=PAYMENT_OPTION,default=PAYMENT_PENDING)
     # One customer can have multiple one or multiple orders, So creation of foreignKey field for customer
-    cutomer_order = models.ForeignKey(Customer, verbose_name=("order of customer"), on_delete=models.PROTECT)
+    customer = models.ForeignKey(Customer, verbose_name=("order of customer"), on_delete=models.PROTECT)
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, verbose_name="Item of Order", on_delete=models.PROTECT)
-    product = models.ForeignKey(Product, verbose_name="product as an Item", on_delete=models.PROTECT)
     quantity = models.PositiveSmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    order = models.ForeignKey(Order, verbose_name="Item of Order", on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, verbose_name="product as an Item", on_delete=models.PROTECT)
 
 
 class Address(models.Model):
