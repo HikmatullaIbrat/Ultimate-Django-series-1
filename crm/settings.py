@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'playground',
+    'maidane_baazi',
     'debug_toolbar',
     'store',
     'tags'

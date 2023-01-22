@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='taggeditem',
             name='content_type',
-            field=models.ForeignKey(default=0, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.contenttype'),
         ),
         migrations.AddField(
             model_name='taggeditem',
             name='object_id',
-            field=models.PositiveIntegerField(default=0.0),
+            field=models.PositiveIntegerField(default=1),
         ),
     ]

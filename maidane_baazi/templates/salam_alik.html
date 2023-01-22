@@ -13,6 +13,20 @@
     {% else %}
         <h1>Salaam, Sanga yi!</h1>
     {% endif %}
+
+    <ul>
+        {% comment %} for returning all columns {% endcomment %}
+         {% comment %} {% for product in products %}
+            <li> {{product.title}}</li>
+        {% endfor %} {% endcomment %}
+
+        {% comment %} for returning just some specific columns by the help of values() method {% endcomment %}
+        {% for product in products %}
+        <li> {{product.title}} -- {{product.collection.title}}</li>
+        {% comment %} <li> {{product.title}} </li> {% endcomment %}
+        {% endfor %}
+            {% comment %} <h6>{{products.title}}</h6> {% endcomment %}
+    </ul>
         
     
 </body>
