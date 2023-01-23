@@ -1,11 +1,14 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from store.models import Product
-from store.models import Collection , Promotion
+from store.models import Collection , Promotion, Order
 from django.db.models import Q
 from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
-from store.models import OrderItem
+from django.db.models.aggregates import Count, Min, Max, Avg, Sum
+from store.models import OrderItem, Customer
+from django.db.models import Value, F, Func
+from django.db.models.functions import Concat
 # Create your views here.
 
 
@@ -98,6 +101,36 @@ def say_salaam(request):
 
     product = Product.objects.prefetch_related('promotions').select_related('collection').all()
 
+    # get last 5 order with their customer and items (including products)
+    orders = Order.objects.select_related('customer').prefetch_related(
+                            'orderitem_set__product').order_by('-placed_at')[:5]
+
+    # Sometimes we need to summarize our objects so we use aggregate function
+    result =  Product.objects.aggregate(count=Count('id'), min_price=Min('unit_price'))
+
+    # # we can do more operations with aggregate()
+    # result =  Product.objects.filter(collection_id=1).aggregate(
+    #             count=Count('id'), min_price=Min('unit_price'))
+
+    # Annotating: in Django instead of the existed columns of models we can make new columns from the models
+    # result = Product.objects.annotate(is_newColumn=Value(True))
+    result = Product.objects.annotate(new_id=F('id') + 1)
+
+    # Calling Database Functions with Func or with Django Database Functions
+    result = Customer.objects.annotate(
+        # CONCAT to show full name of customer first way using Func
+        full_name = Func(F('first_name'), Value('   '), F('last_name'), function="CONCAT")
+    )
+    result = Customer.objects.annotate(
+        # Second way using Concat method(should be imported)
+        full_name = Concat('first_name', Value(" "), 'last_name')
+    )
+
+
+
+    
+
+
     # print(product)
     # for prod in query_set:
     #     print(prod)
@@ -106,5 +139,7 @@ def say_salaam(request):
     # query_set[0]
     # query_set[0:5]
     
-    return render(request, 'salam_alik.html',{'name':'Haroon',"products":product})
+    # return render(request, 'salam_alik.html',{'name':'Haroon',"products":product})
+    return render(request, 'salam_alik.html',{'name':'Haroon',"result":result})
     # return render(request, 'salam_alik.html',{query_set})
+    # return render(request, 'salam_alik.html',{'name':'Haroon',"orders":orders})

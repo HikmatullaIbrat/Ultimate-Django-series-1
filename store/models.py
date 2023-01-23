@@ -82,6 +82,11 @@ class Order(models.Model):
 class OrderItem(models.Model):
     quantity = models.PositiveSmallIntegerField()
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
+    # Django by default creates a reverse relationship like in this that Django created relationship
+    # for OrderItem model in Order model
+    # we can use related_name() to set a user defined name for a relationship
+    # so orderitem_set is the name of relationship of order in orderItem but we can change it with
+    # related_name()
     order = models.ForeignKey(Order, verbose_name="Item of Order", on_delete=models.PROTECT)
     product = models.ForeignKey(Product, verbose_name="product as an Item", on_delete=models.PROTECT)
 

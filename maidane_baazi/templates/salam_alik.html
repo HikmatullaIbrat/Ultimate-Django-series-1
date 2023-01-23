@@ -21,11 +21,16 @@
         {% endfor %} {% endcomment %}
 
         {% comment %} for returning just some specific columns by the help of values() method {% endcomment %}
-        {% for product in products %}
+        {% comment %} {% for product in products %}
         <li> {{product.title}} -- {{product.collection.title}}</li>
-        {% comment %} <li> {{product.title}} </li> {% endcomment %}
-        {% endfor %}
+        {% comment %} <li> {{product.title}} </li> 
+        {% endfor %} {% endcomment %}
             {% comment %} <h6>{{products.title}}</h6> {% endcomment %}
+            {% comment %} {% for order in orders %}
+        <li> {{order.id}} -- {{order.customer.first_name}}</li> {% endcomment %}
+        {% comment %} <li> {{product.title}} </li> {% endcomment %}
+        {% comment %} {% endfor %} {% endcomment %}
+        {{  result }}
     </ul>
         
     
