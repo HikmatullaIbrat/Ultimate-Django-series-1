@@ -30,7 +30,8 @@
         <li> {{order.id}} -- {{order.customer.first_name}}</li> {% endcomment %}
         {% comment %} <li> {{product.title}} </li> {% endcomment %}
         {% comment %} {% endfor %} {% endcomment %}
-        {{  result }}
+        {% comment %} {{  result }} {% endcomment %}
+        {{queryset}}
     </ul>
         
     

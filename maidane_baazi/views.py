@@ -7,7 +7,14 @@ from django.db.models import F
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.aggregates import Count, Min, Max, Avg, Sum
 from store.models import OrderItem, Customer
-from django.db.models import Value, F, Func
+from django.db.models import DecimalField
+ # we can import Count from aggregates or directly models
+from django.db.models import Value, F, Func, Count, ExpressionWrapper
+from django.contrib.contenttypes.models import ContentType
+from store.models import Product
+from tags.models import TaggedItem
+from django.db import transaction
+
 from django.db.models.functions import Concat
 # Create your views here.
 
@@ -119,6 +126,7 @@ def say_salaam(request):
     # Calling Database Functions with Func or with Django Database Functions
     result = Customer.objects.annotate(
         # CONCAT to show full name of customer first way using Func
+        # F is referencing field of a model
         full_name = Func(F('first_name'), Value('   '), F('last_name'), function="CONCAT")
     )
     result = Customer.objects.annotate(
@@ -126,9 +134,107 @@ def say_salaam(request):
         full_name = Concat('first_name', Value(" "), 'last_name')
     )
 
+    # Grouping Data
+    # e.g. List all the order of a customer
+    result = Customer.objects.annotate(
+        # in this query since Order model has a reverse relationship with Customer so we use that relation
+        order_count=Count('order')
+        )
+
+    # Using ExpressionWrapper
+    discounted_price = ExpressionWrapper(
+        F('unit_price') * 0.8, output_field=DecimalField())
+    queryset = Product.objects.annotate(
+        discounted_price=discounted_price
+    )
+
+    # Querying Generic relationships
+    # getting the tag for every Product
+    # but every time we can't write this code so we make a manager from it and use that manager when needed
+    content_type = ContentType.objects.get_for_model(Product)
+    queryset=TaggedItem.objects \
+        .select_related('tag') \
+            .filter(
+                content_type=content_type,
+                object_id=1
+            )
+
+    # Lessons on Caching
 
 
-    
+                                                # Creating Objects
+    # for creating objects we have two methods 1. save() 2. create()
+    # 1. using save()
+    # collection = Collection() 
+    # adding a new value to collection category
+    # collection.title = 'Video Game' 
+    # we could use the below method of adding arguments, but it is not efficient more
+    # collection = Collection(title='video games')
+
+    # for adding a value of a relationship we use both below methods
+    # collection.featured_product = Product(pk=1) # 1
+    # collection.featured_product_id = 1          # 2
+    # in the last we save the new inserted data with save()
+    # collection.save()
+
+
+    # 2. Using the create()
+    # Collection.objects.create(title='History',featured_product_id='2')
+
+
+                                                # Updating Object
+    # 1. first way
+    # collection = Collection.objects.get(pk=9)
+    # collection.featured_product_id = 3
+    # collection.save()
+
+
+    # 2. second way using update()
+    # Collection.objects.filter(pk=12).update(featured_product=3)
+    # Collection.objects.filter(id__gt=5).update(featured_product=5)
+
+                                                # Deleting Object
+    # 1. first way
+    # queryset = Collection.objects.get(pk=14)
+    # queryset.delete()
+ 
+    # 2. second way
+    # Collection.objects.filter(id__gt=10).delete()
+
+
+                                                #Transaction
+    # Transaction should be imported
+    # Transaction means to do two or multiple operation in once or don't anyone of them
+    # e.g. inserting in order and order_item at same time
+    # 1. first operation
+    # in this case both of them are right
+    with transaction.atomic():
+        order =  Order()
+        order.customer_id = 1
+        order.save()
+
+        # 2. Second Operation
+        item = OrderItem()
+        item.order = order
+        item.product_id = 1
+        item.quantity = 1
+        item.unit_price = 10
+        item.save()
+
+    # one operation is not done, so second one will also be rolled back
+    # with transaction.atomic():
+    #     order =  Order()
+    #     order.customer_id = 1
+    #     order.save()
+
+    #     # 2. Second Operation
+    #     item = OrderItem()
+    #     item.order = order
+    #     item.product_id = -1
+    #     item.quantity = 1
+    #     item.unit_price = 10
+    #     item.save()
+                                                        
 
 
     # print(product)
@@ -140,6 +246,7 @@ def say_salaam(request):
     # query_set[0:5]
     
     # return render(request, 'salam_alik.html',{'name':'Haroon',"products":product})
-    return render(request, 'salam_alik.html',{'name':'Haroon',"result":result})
+    # return render(request, 'salam_alik.html',{'name':'Haroon',"result":list(result)})
+    return render(request, 'salam_alik.html',{'name':'Haroon',"queryset":list(queryset)})
     # return render(request, 'salam_alik.html',{query_set})
     # return render(request, 'salam_alik.html',{'name':'Haroon',"orders":orders})

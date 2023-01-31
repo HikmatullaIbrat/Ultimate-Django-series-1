@@ -6,10 +6,23 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 class Tag(models.Model):
     label = models.CharField(max_length=255)
 
+# lesson on caching
+class TaggedItemManager(models.Manager):
+    def get_tags_for(self, obj_type, obj_id):
+        content_type = ContentType.objects.get_for_model(obj_type)
 
+        return TaggedItem.objects \
+            .select_related('tags') \
+                .filter(
+                    content_type=content_type,
+                    object_id = obj_id
+                )
 class TaggedItem(models.Model):
+
+    objects = TaggedItemManager()
     # Which tag applied to which item
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
 
     # we could add a foreignKey of product class to taggetItem class for tagging the items, but it makes 
     # taggedItem dependent to just product class and if want to tag some other contents like videos or 
@@ -22,6 +35,8 @@ class TaggedItem(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE,default=0)
     object_id = models.PositiveIntegerField(default=0.0)
     content_object = GenericForeignKey()
+
+
 
 
 
