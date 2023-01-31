@@ -13,7 +13,7 @@ from django.db.models import Value, F, Func, Count, ExpressionWrapper
 from django.contrib.contenttypes.models import ContentType
 from store.models import Product
 from tags.models import TaggedItem
-from django.db import transaction
+from django.db import transaction, connection
 
 from django.db.models.functions import Concat
 # Create your views here.
@@ -208,18 +208,18 @@ def say_salaam(request):
     # e.g. inserting in order and order_item at same time
     # 1. first operation
     # in this case both of them are right
-    with transaction.atomic():
-        order =  Order()
-        order.customer_id = 1
-        order.save()
+    # with transaction.atomic():
+    #     order =  Order()
+    #     order.customer_id = 1
+    #     order.save()
 
-        # 2. Second Operation
-        item = OrderItem()
-        item.order = order
-        item.product_id = 1
-        item.quantity = 1
-        item.unit_price = 10
-        item.save()
+    #     # 2. Second Operation
+    #     item = OrderItem()
+    #     item.order = order
+    #     item.product_id = 1
+    #     item.quantity = 1
+    #     item.unit_price = 10
+    #     item.save()
 
     # one operation is not done, so second one will also be rolled back
     # with transaction.atomic():
@@ -234,7 +234,25 @@ def say_salaam(request):
     #     item.quantity = 1
     #     item.unit_price = 10
     #     item.save()
-                                                        
+                                                        # Raw SQL queries
+    # 1. first appraoch
+    queryset = Product.objects.raw("select * from store_product")
+
+    # 2. second appraoch using curser, but we should import connection module first
+    # we should use cursor appraoch with try and finally block for more effieciency
+    queryset = connection.cursor()
+    queryset.execute("select id,title from store_product")
+    queryset.close()
+    
+    # Or we can use it with (with) statement
+    with connection.cursor() as cursor:
+        cursor.execute('Select title from store_product')
+
+    # # We can also execute stored procedures
+    # with connection.cursor() as cursor:
+    #     # callproc() is a method for executing procedures, get_customers is procedure's name with its params
+    #     cursor.callproc('get_customers' [1,2,'a'])
+
 
 
     # print(product)
