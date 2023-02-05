@@ -142,7 +142,7 @@ def say_salaam(request):
         )
 
     # Using ExpressionWrapper
-    discounted_price = ExpressionWrapper(
+    discounted_price = ExpressionWrapper( # ExpWrap is used for complex operations
         F('unit_price') * 0.8, output_field=DecimalField())
     queryset = Product.objects.annotate(
         discounted_price=discounted_price
@@ -253,7 +253,10 @@ def say_salaam(request):
     #     # callproc() is a method for executing procedures, get_customers is procedure's name with its params
     #     cursor.callproc('get_customers' [1,2,'a'])
 
-
+    # the last section is about admin panel in django
+    # for changing password of admin
+        # python manage.py changepassword admin
+    
 
     # print(product)
     # for prod in query_set:

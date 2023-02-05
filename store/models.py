@@ -14,6 +14,14 @@ class Collection(models.Model):
     # for circular relationship is to name it something different or simply add a plus sign in related name.
     # Indeed Circular dependancy means two classes or table are dependent on each other at the same time.
     featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+')
+
+    # to change the object to string in admin panel
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        ordering = ['title']
+    
    
 
 
@@ -37,6 +45,11 @@ class Product(models.Model):
     # should not be deleted.
     
     slug = models.SlugField(default = "-", blank=True)
+    def __str__(self) -> str:
+        return self.title
+
+    class Meta:
+        ordering = ['-title']
 
 class Customer(models.Model):
     BRONZE_MEMBERSHIP='B'
@@ -56,6 +69,11 @@ class Customer(models.Model):
     # membership_choice = models.Choices(max_length=1,default=BRONZE_MEMBERSHIP)
     membership_choice = models.CharField(max_length=1, choices=MEMBERSHIP_SUBSCRIPTION, default=BRONZE_MEMBERSHIP)
 
+    def __str__(self) -> str:
+        return self.first_name
+
+    class Meta:
+        ordering = ['first_name']
     # we use class meta for adding more info about models like displaying objects in descending order
     class Meta:
             db_table = 'store_customers' # set the table name
