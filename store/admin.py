@@ -87,3 +87,4 @@ class CustomerAdmin(admin.ModelAdmin):
     
     
 
+# Customizing Forms for adding and updating objects
