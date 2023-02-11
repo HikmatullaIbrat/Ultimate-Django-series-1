@@ -39,7 +39,7 @@ class Product(models.Model):
     # one product can be once in a collection, but on the other hand one collection can have multiple 
     # products
     # Never name a foriegnKey field something_id just use something when your using MySQL like the below one
-    collection =  models.ForeignKey(Collection, verbose_name=("collection of multiple products"), on_delete=models.CASCADE)
+    collection =  models.ForeignKey(Collection, verbose_name=("catagory of product"), on_delete=models.CASCADE)
     # also in another senario a collection can have one or zero featured_product
     #CASCADE.PROTECT means if we accedently deleted a collection all the products in that collection
     # should not be deleted.

@@ -17,11 +17,6 @@ from django.contrib import admin
 from django.urls import path , re_path, include
 import debug_toolbar
 
-# to change header of admin panel
-admin.site.site_header = "Store App Admin Panel"
-# To change the text lower than admin header
-admin.site.index_title = "Administration of Store site"
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path('maidane_baazi/',  include('maidane_baazi.urls')),
