@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from . import models
 # Register your models here.
 
@@ -23,7 +23,9 @@ class InventoryFilter(admin.SimpleListFilter): # Making a Custom Filter
     def queryset(self, request, queryset):
         if self.value() == '<10':
             return queryset.filter(inventory__lt=10)
-           
+
+
+  
 
 # for listing to objects to show we have to ways
 # to learn more, search (django modelAdmin)
@@ -42,6 +44,8 @@ class ProductAdmin(admin.ModelAdmin):
     list_select_related = ['collection']
     # adding filter to objects
     list_filter = ['collection','last_update',InventoryFilter] # adding Custom Filter
+    # passing the name of custom action method
+    actions = ['clear_inventory']
 
     #case1 definiation
      # Sorting the columns by with a new column(adding computed column)
@@ -51,7 +55,22 @@ class ProductAdmin(admin.ModelAdmin):
         if product.inventory < 10:
             return 'Low'
         return 'OK'
- 
+   #Creating Custom Actions
+   # e.g. clearing the inventory of multiple products in one time
+    @admin.action(description='Clear inventory')
+    def clear_inventory(self, request, queryset):
+        updated_count = queryset.update(inventory=0)
+        self.message_user(
+            request,
+            f'{updated_count} Products were successfully updated',
+            messages.WARNING  # there different types of messages like: error, warning, success
+        )
+           
+
+
+
+   
+
 
 # #2. or if we don't use register decorator we can do this below method
 # admin.site.register(models.Product, ProductAdmin)
@@ -68,4 +87,3 @@ class CustomerAdmin(admin.ModelAdmin):
     
     
 
-   
